@@ -26,3 +26,10 @@ def socket_bind():
         print("socket binding error: ", + str(msg) + "\n" + "Please retry ...")
         socket_bind() #donc si erreur, on relance la fonction !
 
+# Accepter la connection avec le client
+def accept_socket():
+    conn, address = sock.accept() #attendre que la connection se fasse et afficher le message qui suit avec les infos sur l'ip et le port du client
+    print("Connection established on " + "IP " + address[0] + ":" + str(address[1]))
+    send_commands(conn) #Fonction qui permettra d'envoyer des commandes
+    conn.close()
+
