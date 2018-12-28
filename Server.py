@@ -33,4 +33,21 @@ def accept_socket():
     send_commands(conn) #Fonction qui permettra d'envoyer des commandes
     conn.close()
 
+def send_commands(conn):
+    while True: #connection constante (boucle infinie)
+        cmd = input()
+        if cmd == 'stop':
+            conn.close()
+            sock.close()
+            sys.exit()
+        if len(str.encode(cmd)) > 0: #>0 pour ne pas envoyer des trames réseau pour rien si elles sont vide !
+            conn.send(str.encode(cmd))
+            client_response = str(conn.recv(1024), "utf-8") #1024 pour le buffer et encodage utf-8 pour la lisibilité car on utilise bytes et string
+            print(client_response, end="")
 
+def main(): #creation d'une fonction qui contient chaque étape (sauf l'envoie de commandes car il se fait déjà dans la fonction accept_socket()
+    socket_creation()
+    socket_bind()
+    accept_socket()
+
+main() #Appel de la fonction principale
