@@ -33,3 +33,4 @@ def accept_socket():
     send_commands(conn) #Fonction qui permettra d'envoyer des commandes
     conn.close()
 
+
