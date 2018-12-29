@@ -98,6 +98,23 @@ def get_trgt(cmd):
     except:  #Si la selection n'est pas bonne
         print("Selection is not in the list ... ")
         return None  #None car il faut retourner qqchose
+
+# Connection avec le client cible
+def send_trgt_cmd(conn):
+    while True: # Boucle infinie pour attendre les différentes commandes
+        try:
+            cmd = input()
+            if len(str.encode(cmd)) > 0:
+                conn.send(str.encode(cmd))
+                client_resp = str(conn.recv(20480), "utf-8")
+                print(client_resp, end="")
+            if cmd == 'stop':
+                break  # Quitter la boucle infinie
+        except:
+            print("Connection has been lost")
+            break
+
+
 """
 # Version Précédente !
 def send_commands(conn):
