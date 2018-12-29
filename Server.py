@@ -62,7 +62,7 @@ def accept_socket():
 def start_prompt():
     while True:
         cmd = input('Shell> ')
-        if == 'lstc':
+        if cmd == 'lstc':
             list_connection()  #Liste les connections
             continue
         elif 'select' in cmd:
@@ -86,6 +86,7 @@ def list_connection():
         result += str(i) + '   ' + str(addresses[i][0]) + ':' + str(addresses[i][1]) + '\n'
     print("###### List of Clients ######" + "\n" + result)
 """
+# Version Précédente !
 def send_commands(conn):
     while True: #connection constante (boucle infinie)
         cmd = input()
