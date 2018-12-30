@@ -100,8 +100,8 @@ def start_prompt():
                         client_response = str(conn.recv(20480))
                         print(client_response)
                     elif len(str.encode(cmd)) > 0:
-                        conn.send(cmd)
-                        client_response = str(conn.recv(20480))
+                        conn.send(str.encode(cmd))
+                        client_response = str(conn.recv(20480), "utf-8")
                         print(client_response, end="")
                 except socket.error as msg:
                     print("Connection was lost" + str(msg))
