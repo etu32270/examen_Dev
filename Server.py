@@ -1,7 +1,8 @@
+# https://github.com/etu32270/examen_Dev
 import socket
+import subprocess
 import threading
 from queue import Queue
-import subprocess
 
 THREADS = 2
 NUMBER = [1, 2]
@@ -70,12 +71,12 @@ def accept_socket():
 
 # Shell
 def start_prompt():
-    print("### Interactive Shell ###")
+    print("@@@@ Interactive Shell @@@@")
     while True:
         cmd = input('Shell> ')
         if cmd == 'list':
 
-            print('----- Clients -----')
+            print('***** Clients *****')
             for address in addresses:
                 print(str(addresses.index(address) + 1) + '   ' + str(address[0]) + '   ' + str(address[1]))
             print('')
